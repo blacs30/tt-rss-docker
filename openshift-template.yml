@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: tt-rss-template
+labels:
+  template: tt-rss
+  app: tt-rss
+objects:
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: tt-rss
+    partof: tt-rss
+  spec:
+    template: 
+      metadata:
+        labels:
+          name: tt-rss
+          partof: tt-rss
+      spec:
+        containers:
+        - name: tt-rss
+          env:
+          - name: MODE
+            value: app 
+          image: "docker.terhaak.de/jojo/tt-rss"
+          ports:
+          - containerPort: 80
+            protocol: TCP
+          securityContext:
+            privileged: false
+            runAsUser: 0
+          volumeMounts:
+          - mountPath: "/data"
+            name: "datavol"
+        volumes:
+        - name: "datavol"
+          persistentVolumeClaim:
+            claimName: "tt-rss-data-claim"
+    replicas: 1
+    triggers:
+      - type: ConfigChange
+    strategy: 
+      type: Recreate
+    paused: false 
+    revisionHistoryLimit: 2 
+    minReadySeconds: 0  
+
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: tt-rss-updater
+    partof: tt-rss
+  spec:
+    template: 
+      metadata:
+        labels:
+          name: tt-rss-updater
+          partof: tt-rss
+      spec:
+        containers:
+        - name: tt-rss-updater
+          env:
+          - name: MODE
+            value: updater
+          image: "docker.terhaak.de/jojo/tt-rss"
+          securityContext:
+            privileged: false
+            runAsUser: 0
+          volumeMounts:
+          - mountPath: "/data"
+            name: "datavol"
+        volumes:
+        - name: "datavol"
+          persistentVolumeClaim:
+            claimName: "tt-rss-data-claim"
+    replicas: 1
+    triggers:
+      - type: ConfigChange
+    strategy: 
+      type: Recreate
+    paused: false 
+    revisionHistoryLimit: 2 
+    minReadySeconds: 0
+
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: tt-rss
+  spec:
+    selector:
+      name: tt-rss
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: tt-rss
+  spec:
+    host: tt-rss-jojo.apps.lan.terhaak.de
+    to:
+      kind: Service
+      name: tt-rss
+
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: tt-rss-data-claim
+  spec:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 500Mi
+
+
