@@ -1,44 +1,82 @@
-# Build and push the image
-
-```
-docker build -t docker.terhaak.de/jojo/tt-rss .
-docker push docker.terhaak.de/jojo/tt-rss
-```
-
 # Deploy on openshift
 
-First create a persitent volume as admin (or let it be created for you)
+First create a persitent volume as admin (or let it be created for you). 
+The template uses the `supplementalGroups` 5555.
 
-Create the objects from the template:
+Change to the root of the GIT tree and build the docker image:
 
 ```
-oc -n jojo process -f openshift-template.yml | oc -n jojo create -f -
+docker build -t docker-registry-default.apps.lan.terhaak.de/ttrss-test/tt-rss:latest .
 ```
 
-Replace `jojo` with your project-namespace.
+Adjust the docker-tag to point to your internal openshift registry.
 
-Prepare a folder with your `config.php` and possibly `feed-icons` folder.
+The template exposes some configuration parameters. You can set them in the web console
+while importing the template, or on the command line using a env-file.
+
+Create a file `ttrss.env` and adapt the values:
+
+```sh
+DB_TYPE="mysql"
+DB_HOST="myhost"
+DB_USER="myuser"
+DB_NAME="mydb"
+DB_PASS="mypass"
+DB_PORT="3306"
+SELF_URL_PATH="https://example.com/ttrss"
+SINGLE_USER_MODE="false"
+APP_ROUTE_HOST="my-ttrss.apps.example.com"
+```
+
+Make sure to change to your project (adapt the project name):
+
+```
+oc project my-ttrss
+```
+
+Create the openshift objects based on the template:
+
+```
+oc process --param-file=ttrss.env -f openshift-template.yml | oc create -f -
+```
+
+Push the docker image to the internal registry to trigger the deployment. The 
+containers will automatically redeploy when the docker image is updated.
+
+```
+docker push docker-registry-default.apps.lan.terhaak.de/ttrss-test/tt-rss:latest
+```
+
+You can override the default configurations and the parameters from the template 
+using a normal tt-rss config file. Refer to the file `config.php-dist` in the tt-rss
+GIT tree for details. Drop the config file into the root of the data volume mounted 
+in the containers on `/data`.
+  
+Prepare a folder on your local host (example: `/tmp/data`) 
+with your `config.php` and possibly a `feed-icons` folder.
 
 Get a list of the running pods and remember the name of the tt-rss pod:
 
 ```
-oc -n jojo get pods
+oc get pods
 ```
 
 Sync the files to the persistent volume:
 
 ```
-oc -n jojo rsync -c tt-rss /home/jojo/Desktop/data/ tt-rss-1-gn5ej:/data/
+oc rsync -c tt-rss /tmp/data/ tt-rss-1-gn5ej:/data/
 ```
 
 replace `tt-rss-1-gn5ej` with the pod name.
 
-Once the config.php is there the updater pod should stop crashing and you can visit 
-the URL pointing to thye router. Apply the database-upgrade if necessary.
+Now visit the url set in `SELF_URL_PATH`.
 
 # Deploy on bare docker
 
+You can pass the same environment variables as in the openshift 
+template, except for `APP_ROUTE_HOST`.
+
 ```
-docker run -it --rm -p 8005:80 -v /home/jojo/Desktop/data:/data  -e MODE=app docker.terhaak.de/jojo/tt-rss
-docker run -it --rm -v /home/jojo/Desktop/data:/data -e MODE=updater docker.terhaak.de/jojo/tt-rss
+docker run -it --rm -p 8005:8080 -v /tmp/data:/data -e MODE=app tt-rss
+docker run -it --rm -v /tmp/data:/data -e MODE=updater tt-rss
 ```
