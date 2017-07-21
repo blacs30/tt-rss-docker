@@ -34,6 +34,8 @@ objects:
         - name: "datavol"
           persistentVolumeClaim:
             claimName: "tt-rss-data-claim"
+        securityContext: 
+          supplementalGroups: [5555] 
     replicas: 1
     triggers:
       - type: ConfigChange
@@ -76,6 +78,8 @@ objects:
         - name: "datavol"
           persistentVolumeClaim:
             claimName: "tt-rss-data-claim"
+        securityContext: 
+          supplementalGroups: [5555] 
     replicas: 1
     triggers:
       - type: ConfigChange
@@ -101,9 +105,9 @@ objects:
     selector:
       name: tt-rss
     ports:
-    - port: 80
+    - port: 8080
       protocol: TCP
-      targetPort: 80
+      targetPort: 8080
 
 - kind: Route
   apiVersion: v1
