@@ -29,11 +29,13 @@ RUN find /var/www/html -type f -exec chmod 644 {} \; \
     && find /var/www/html -type d -exec chmod 755 {} \; \
     && chmod 777 cache/images cache/upload cache/export cache/js feed-icons lock
 
+COPY ./config/ttrss/config.php /var/www/html/config.php
+
 COPY ./config/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 VOLUME /data
-RUN ln -s /data/config.php /var/www/html/ \
+RUN ln -s /data/config.php /var/www/html/config-user.php \
     && rm -Rf /var/www/html/feed-icons \
     && ln -s /data/feed-icons /var/www/html/
 
