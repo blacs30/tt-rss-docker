@@ -23,13 +23,10 @@ objects:
           env:
           - name: MODE
             value: app 
-          image: "docker.terhaak.de/jojo/tt-rss"
+          image: "tt-rss"
           ports:
-          - containerPort: 80
+          - containerPort: 8080
             protocol: TCP
-          securityContext:
-            privileged: false
-            runAsUser: 0
           volumeMounts:
           - mountPath: "/data"
             name: "datavol"
@@ -40,6 +37,14 @@ objects:
     replicas: 1
     triggers:
       - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+            - tt-rss
+          from:
+            kind: ImageStreamTag
+            name: "tt-rss:latest"
     strategy: 
       type: Recreate
     paused: false 
@@ -63,10 +68,7 @@ objects:
           env:
           - name: MODE
             value: updater
-          image: "docker.terhaak.de/jojo/tt-rss"
-          securityContext:
-            privileged: false
-            runAsUser: 0
+          image: "tt-rss"
           volumeMounts:
           - mountPath: "/data"
             name: "datavol"
@@ -77,6 +79,14 @@ objects:
     replicas: 1
     triggers:
       - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+            - tt-rss
+          from:
+            kind: ImageStreamTag
+            name: "tt-rss:latest"
     strategy: 
       type: Recreate
     paused: false 
@@ -116,4 +126,12 @@ objects:
       requests:
         storage: 500Mi
 
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+      name: "tt-rss"
+  spec:
+    dockerImageRepository: ""
+    tags:
+      - name: "latest"
 
