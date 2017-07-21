@@ -23,6 +23,22 @@ objects:
           env:
           - name: MODE
             value: app 
+          - name: DB_TYPE
+            value: "${DB_TYPE}"
+          - name: DB_HOST
+            value: "${DB_HOST}"
+          - name: DB_USER
+            value: "${DB_USER}"
+          - name: DB_NAME
+            value: "${DB_NAME}"
+          - name: DB_PASS
+            value: "${DB_PASS}"
+          - name: DB_PORT
+            value: "${DB_PORT}"
+          - name: SELF_URL_PATH
+            value: "${SELF_URL_PATH}"
+          - name: SINGLE_USER_MODE
+            value: "${SINGLE_USER_MODE}"
           image: "tt-rss"
           ports:
           - containerPort: 8080
@@ -114,7 +130,7 @@ objects:
   metadata:
     name: tt-rss
   spec:
-    host: tt-rss-jojo.apps.lan.terhaak.de
+    host: "${APP_ROUTE_HOST}"
     to:
       kind: Service
       name: tt-rss
@@ -139,3 +155,26 @@ objects:
     tags:
       - name: "latest"
 
+parameters:
+- name: APP_ROUTE_HOST
+  description: Hostname use for the router object
+  value: tt-rss-jojo.apps.lan.terhaak.de
+  required: true
+- name: DB_TYPE
+  description: Database type, mysql or psql
+  value: mysql
+- name: DB_HOST
+  description: Database host
+- name: DB_USER
+  description: Database user
+- name: DB_NAME
+  description: Database name
+- name: DB_PASS
+  description: Database password
+- name: DB_PORT
+  description: Database port
+  value: "3306"
+- name: SELF_URL_PATH
+  description: Full URL of your tt-rss installation
+- name: SINGLE_USER_MODE
+  description: Operate in single user mode
