@@ -46,46 +46,26 @@ objects:
           volumeMounts:
           - mountPath: "/data"
             name: "datavol"
-        volumes:
-        - name: "datavol"
-          persistentVolumeClaim:
-            claimName: "tt-rss-data-claim"
-        securityContext: 
-          supplementalGroups: [5555] 
-    replicas: 1
-    triggers:
-      - type: ConfigChange
-      - type: ImageChange
-        imageChangeParams:
-          automatic: true
-          containerNames:
-            - tt-rss
-          from:
-            kind: ImageStreamTag
-            name: "tt-rss:latest"
-    strategy: 
-      type: Recreate
-    paused: false 
-    revisionHistoryLimit: 2 
-    minReadySeconds: 0  
-
-- kind: DeploymentConfig
-  apiVersion: v1
-  metadata:
-    name: tt-rss-updater
-    partof: tt-rss
-  spec:
-    template: 
-      metadata:
-        labels:
-          name: tt-rss-updater
-          partof: tt-rss
-      spec:
-        containers:
         - name: tt-rss-updater
           env:
           - name: MODE
             value: updater
+          - name: DB_TYPE
+            value: "${DB_TYPE}"
+          - name: DB_HOST
+            value: "${DB_HOST}"
+          - name: DB_USER
+            value: "${DB_USER}"
+          - name: DB_NAME
+            value: "${DB_NAME}"
+          - name: DB_PASS
+            value: "${DB_PASS}"
+          - name: DB_PORT
+            value: "${DB_PORT}"
+          - name: SELF_URL_PATH
+            value: "${SELF_URL_PATH}"
+          - name: SINGLE_USER_MODE
+            value: "${SINGLE_USER_MODE}"
           image: "tt-rss"
           volumeMounts:
           - mountPath: "/data"
@@ -104,6 +84,7 @@ objects:
           automatic: true
           containerNames:
             - tt-rss
+            - tt-rss-updater
           from:
             kind: ImageStreamTag
             name: "tt-rss:latest"
