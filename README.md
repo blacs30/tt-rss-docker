@@ -72,6 +72,11 @@ replace `tt-rss-1-gn5ej` with the pod name.
 
 Now visit the url set in `SELF_URL_PATH`.
 
+# Reverse proxy setup
+
+See [reverse-proxy.md](reverse-proxy.md) for details on how to deploy behind a reverse
+proxy.
+
 # Deploy on bare docker
 
 You can pass the same environment variables as in the openshift 
