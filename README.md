@@ -50,7 +50,8 @@ docker push docker-registry-default.apps.lan.terhaak.de/ttrss-test/tt-rss:latest
 You can override the default configurations and the parameters from the template 
 using a normal tt-rss config file. Refer to the file `config.php-dist` in the tt-rss
 GIT tree for details. Drop the config file into the root of the data volume mounted 
-in the containers on `/data`.
+in the containers on `/data`. This way you can also add a `.htaccess` file which will
+be linked into the www-base directory. You can use this to add rewrite rules. 
   
 Prepare a folder on your local host (example: `/tmp/data`) 
 with your `config.php` and possibly a `feed-icons` folder.

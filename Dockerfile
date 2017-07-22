@@ -17,7 +17,8 @@ RUN rm -Rf /var/www/html/* && git clone https://tt-rss.org/git/tt-rss.git /var/w
 RUN ln -sf /dev/stdout /var/log/apache2/access.log \
     && ln -sf /dev/stdout /var/log/apache2/error.log \
     && chmod 777 /var/log/apache2/ /var/run/apache2/ /var/lock/apache2/ \
-    && a2disconf other-vhosts-access-log.conf
+    && a2disconf other-vhosts-access-log.conf \
+    && a2enmod rewrite 
 
 COPY ./config/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 COPY ./config/apache/ports.conf /etc/apache2/ports.conf
@@ -37,7 +38,8 @@ RUN chmod +x /entrypoint.sh
 VOLUME /data
 RUN ln -s /data/config.php /var/www/html/config-user.php \
     && rm -Rf /var/www/html/feed-icons \
-    && ln -s /data/feed-icons /var/www/html/
+    && ln -s /data/feed-icons /var/www/html/ \
+    && ln -s /data/.htaccess /var/www/html/
 
 ENV MODE=apache
 EXPOSE 8080
