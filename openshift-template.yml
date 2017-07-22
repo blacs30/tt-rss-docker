@@ -112,6 +112,7 @@ objects:
     name: tt-rss
   spec:
     host: "${APP_ROUTE_HOST}"
+    path: "${APP_ROUTE_PATH}"
     to:
       kind: Service
       name: tt-rss
@@ -141,6 +142,9 @@ parameters:
   description: Hostname use for the router object
   value: tt-rss-jojo.apps.lan.terhaak.de
   required: true
+- name: APP_ROUTE_PATH
+  description: Path use for the router object
+  value: 
 - name: DB_TYPE
   description: Database type, mysql or psql
   value: mysql
