@@ -1,3 +1,68 @@
+# Reverse proxy setup to kubernetes
+
+The helm chart sets up a *nodePort* type service. This means that kubernetes 
+exposes the tt-rss service on a specific port number (selected by k8s) on all nodes.
+One could use ingress to load balance inside of kubernetes, however using 
+already apache httpd for my main website, I prefer to directly use the load balancing
+capacities of apache.
+
+This is a schema of the set up:
+
+```
+                                 +----------+    +-----------+
+                             +-> | k8s node | -> | ttrss pod |
+                +---------+  |   +----------+    +-----------+
++---------+     | apache  |  |   +----------+          ^
+| Browser | ->  | reverse | -*-> | k8s node | -------->|
++---------+     | proxy   |  |   +----------+          |
+                +---------+  |   +----------+          |
+                             +-> | k8s node | -------->|
+                                 +----------+
+```
+
+Apache distributes the load to the kubernetes nodes. When traffic enters a node
+it is routed to the corresponding pod, regardless on which node the pod runs 
+(due to the overlay network used by k8s). If the node with the pod fails, the pod 
+is rescheduled on a free available node and the traffic is redirected to the new pod.
+
+Note that this still has single point of failures. However shutting down the main 
+apache httpd means shutting down the complete website and thus is avoided.
+
+First get the node port assigned to the service of tt-rss:
+
+```
+kubectl get service
+```
+
+Now to the apache configs:
+
+```xml
+<Proxy balancer://my-ha-ttrss>
+    BalancerMember http://kubernetes-node1.example.com:30958
+    BalancerMember http://kubernetes-node2.example.com:30958
+    BalancerMember http://kubernetes-node3.example.com:30958
+    ProxySet lbmethod=byrequests
+</Proxy>
+
+RedirectPermanent "/apps/ttrss" "https://www.example.com/apps/ttrss/"
+<LocationMatch "^/apps/ttrss/(.*)$" >
+    ProxyPass "balancer://my-ha-ttrss/apps/ttrss/$1"
+    ProxyPassReverse "balancer://my-ha-ttrss/apps/ttrss/$1"
+    ProxyPreserveHost On
+</LocationMatch>
+```
+
+Enable the load balancer module and restart apache:
+
+```
+a2enmod proxy_balancer
+a2enmod lbmethod_byrequests
+systemctl restart apache2
+```
+
+Do not forget to make the common app config changes (described below).
+
+
 # Reverse proxy setup with Openshift
 
 Setup:
