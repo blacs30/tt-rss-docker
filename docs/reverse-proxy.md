@@ -1,4 +1,4 @@
-# Reverse proxy setup
+# Reverse proxy setup with Openshift
 
 Setup:
 ```
@@ -47,8 +47,14 @@ APP_ROUTE_PATH="/apps/ttrss"
 Note the missing trailing slash on `APP_ROUTE_PATH`, required for openshift to 
 proxy also sub-urls.
 
-TT-RSS will still complain about wrong `SELF_URL_PATH` because of the TLS termination.
-( `https://` instead of `http://`). So add the the following line to `config.php`
+Do not forget to make the common app config changes (described below).
+
+# Common app config for reverse proxying tt-rss
+
+TT-RSS will complain about wrong `SELF_URL_PATH` because the TLS termination 
+happens before the app container. Tt-rss will see `http://` instead of `https://`
+
+We need to add the the following line to `config.php`
 
 ```
 define('_SKIP_SELF_URL_PATH_CHECKS', true);
@@ -66,6 +72,5 @@ RewriteRule  "^app/ttrss/(.*)$" "/$1"
 Note the missing leading slash in the rule pattern. Rewrite rules in `.htaccess`
 files are relative to the directory where they reside, thus in this case `/`. 
 
-Rsync this file into the data volume along `config.php` and `feed-icons`.
-
-Now everything should work as expected.
+Copy `config.php` and `.htaccess` into the root of the data volume of the app container
+and restart the container. Now you should be able to use tt-rss.
