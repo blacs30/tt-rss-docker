@@ -1,20 +1,35 @@
-FROM debian:8
+FROM debian:9 as builder
+WORKDIR /source
 
-RUN apt-get update && apt-get install -y \
-        apache2 \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
         git \
-        php5 \
-        php5-curl \
-        php5-gd \
-        php5-mcrypt \
-        php5-mysql \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# get TTRSS
-RUN rm -Rf /var/www/html/* && git clone https://tt-rss.org/git/tt-rss.git /var/www/html
+# download TTRSS
+RUN git clone --depth 1 https://git.tt-rss.org/fox/tt-rss.git /source
+
+
+
+FROM debian:9
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        apache2 \
+        ca-certificates \
+        libapache2-mod-php7.0 \
+        php7.0-cli \
+        php7.0-curl \
+        php7.0-gd \
+        php7.0-intl \
+        php7.0-json \
+        php7.0-mbstring \
+        php7.0-mysql \ 
+        php7.0-xml \
+    && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/www/html/*
 
 # configure apache to work with docker
-RUN ln -sf /dev/stdout /var/log/apache2/access.log \
+RUN mkdir -p /var/log/apache2/ /var/run/apache2/ /var/lock/apache2/ \
+    && ln -sf /dev/stdout /var/log/apache2/access.log \
     && ln -sf /dev/stdout /var/log/apache2/error.log \
     && chmod 777 /var/log/apache2/ /var/run/apache2/ /var/lock/apache2/ \
     && a2disconf other-vhosts-access-log.conf \
@@ -24,11 +39,12 @@ COPY ./config/apache/000-default.conf /etc/apache2/sites-available/000-default.c
 COPY ./config/apache/ports.conf /etc/apache2/ports.conf
 
 WORKDIR /var/www/html
+COPY --from=builder /source /var/www/html
 
 # configure file permissions for ttrss
 RUN find /var/www/html -type f -exec chmod 644 {} \; \
     && find /var/www/html -type d -exec chmod 755 {} \; \
-    && chmod 777 cache/images cache/upload cache/export cache/js feed-icons lock
+    && chmod 777 cache/* feed-icons lock
 
 COPY ./config/ttrss/config.php /var/www/html/config.php
 
