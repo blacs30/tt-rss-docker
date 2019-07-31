@@ -6,7 +6,7 @@ database:
 
   ## Database host
   host: ""
-  
+
   ## Database user
   user: ""
 
@@ -22,7 +22,7 @@ database:
 ttrss:
   ## Full URL of your tt-rss installation
   selfUrl: "3306"
-  
+
   ## Operate in single user mode
   singleUser: "true"
 
@@ -31,7 +31,7 @@ replicaCount: 1
 
 ## Main ttrss Docker image
 image:
-  repository: reg.lan.terhaak.de/jojo/tt-rss
+  repository: blacs30/tt-rss-docker
   tag: latest
   pullPolicy: Always
 
@@ -47,10 +47,10 @@ persistence:
 service:
   type: NodePort
   port: 80
-  
+
 securityContext:
   ## the data file's owner group
-  supplementalGroups: [5000] 
+  supplementalGroups: [5000]
 
 ingress:
   enabled: false
