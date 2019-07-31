@@ -1,14 +1,17 @@
 FROM debian:9 as builder
+
+ENV TTRSS_VERSION=19.2
+
 WORKDIR /source
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
-        git \
+        curl \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # download TTRSS
-RUN git clone --depth 1 https://git.tt-rss.org/fox/tt-rss.git /source
-
+RUN curl -L https://git.tt-rss.org/fox/tt-rss/archive/${TTRSS_VERSION}.tar.gz -o /ttrss.tar.gz \
+    && tar xzf /ttrss.tar.gz -C /source --strip 1
 
 
 FROM debian:9
@@ -23,7 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         php7.0-intl \
         php7.0-json \
         php7.0-mbstring \
-        php7.0-mysql \ 
+        php7.0-mysql \
         php7.0-xml \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/www/html/*
 
@@ -33,7 +36,7 @@ RUN mkdir -p /var/log/apache2/ /var/run/apache2/ /var/lock/apache2/ \
     && ln -sf /dev/stdout /var/log/apache2/error.log \
     && chmod 777 /var/log/apache2/ /var/run/apache2/ /var/lock/apache2/ \
     && a2disconf other-vhosts-access-log.conf \
-    && a2enmod rewrite 
+    && a2enmod rewrite
 
 COPY ./config/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 COPY ./config/apache/ports.conf /etc/apache2/ports.conf
