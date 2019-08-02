@@ -1,4 +1,4 @@
-FROM debian:9 as builder
+FROM debian:10 as builder
 
 ENV TTRSS_VERSION=19.2
 
@@ -11,23 +11,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # download TTRSS
 RUN curl -L https://git.tt-rss.org/fox/tt-rss/archive/${TTRSS_VERSION}.tar.gz -o /ttrss.tar.gz \
-    && tar xzf /ttrss.tar.gz -C /source --strip 1
+    && tar xzf /ttrss.tar.gz -C /source --strip 1 && test -f /ttrss.tar.gz && rm -f /ttrss.tar.gz
 
 
-FROM debian:9
+FROM debian:10
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         apache2 \
         ca-certificates \
-        libapache2-mod-php7.0 \
-        php7.0-cli \
-        php7.0-curl \
-        php7.0-gd \
-        php7.0-intl \
-        php7.0-json \
-        php7.0-mbstring \
-        php7.0-mysql \
-        php7.0-xml \
+        libapache2-mod-php7.3 \
+        php7.3-cli \
+        php7.3-curl \
+        php7.3-gd \
+        php7.3-intl \
+        php7.3-json \
+        php7.3-mbstring \
+        php7.3-mysql \
+        php7.3-pgsql \
+        php7.3-xml \
+        git \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/www/html/*
 
 # configure apache to work with docker
@@ -45,24 +47,20 @@ WORKDIR /var/www/html
 COPY --from=builder /source /var/www/html
 
 # configure file permissions for ttrss
-RUN find /var/www/html -type f -exec chmod 644 {} \; \
+RUN chown -R 1001:1001 /var/www/html && find /var/www/html -type f -exec chmod 644 {} \; \
     && find /var/www/html -type d -exec chmod 755 {} \; \
     && chmod 777 cache/* feed-icons lock
 
 COPY ./config/ttrss/config.php /var/www/html/config.php
 
-COPY ./config/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY ./config/srv /srv/
+RUN chmod +x /srv/*sh
 
 VOLUME /data
-RUN ln -s /data/config.php /var/www/html/config-user.php \
-    && rm -Rf /var/www/html/feed-icons \
-    && ln -s /data/feed-icons /var/www/html/ \
-    && ln -s /data/.htaccess /var/www/html/
 
 ENV MODE=apache
 EXPOSE 8080
 
 USER 1001
 
-CMD /entrypoint.sh
+CMD /srv/setup-ttrss.sh
