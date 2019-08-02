@@ -55,6 +55,6 @@ if [ "x$MODE" == "xupdater" ]; then
     echo "Setup: Applying updates ..."
     exec php /var/www/html/update.php --daemon
 else
-    exec /srv/update-feeds.sh &
+    exec php -f /var/www/html/update_daemon2.php &
     exec apache2ctl -DFOREGROUND
 fi
