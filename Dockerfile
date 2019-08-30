@@ -1,6 +1,6 @@
 FROM debian:10 as builder
 
-ENV TTRSS_VERSION=19.2
+ENV TTRSS_VERSION=19.8
 
 WORKDIR /source
 
