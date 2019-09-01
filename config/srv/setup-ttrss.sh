@@ -7,15 +7,15 @@ setup_ttrss()
     TTRSS_PATH_THEMES=${TTRSS_PATH}/themes.local
     TTRSS_PATH_PLUGINS=${TTRSS_PATH}/plugins.local
 
-    echo "Setup plugins and themes"
-    mkdir -p ${TTRSS_PATH_PLUGINS}
-    git clone --depth=1 https://github.com/sepich/tt-rss-mobilize.git ${TTRSS_PATH_PLUGINS}/mobilize
-    git clone --depth=1 https://github.com/m42e/ttrss_plugin-feediron.git ${TTRSS_PATH_PLUGINS}/feediron
-    git clone --depth=1 https://github.com/DigitalDJ/tinytinyrss-fever-plugin ${TTRSS_PATH_PLUGINS}/fever
+    # echo "Setup plugins and themes"
+    # mkdir -p ${TTRSS_PATH_PLUGINS}
+    # git clone --depth=1 https://github.com/sepich/tt-rss-mobilize.git ${TTRSS_PATH_PLUGINS}/mobilize
+    # git clone --depth=1 https://github.com/m42e/ttrss_plugin-feediron.git ${TTRSS_PATH_PLUGINS}/feediron
+    # git clone --depth=1 https://github.com/DigitalDJ/tinytinyrss-fever-plugin ${TTRSS_PATH_PLUGINS}/fever
 
-    mkdir -p ${TTRSS_PATH_THEMES}
-    git clone --depth=1 https://github.com/levito/tt-rss-feedly-theme.git ${TTRSS_PATH_THEMES}/levito-feedly-git
-    git clone --depth=1 https://github.com/Gravemind/tt-rss-feedlish-theme.git ${TTRSS_PATH_THEMES}/gravemind-feedly-git
+    # mkdir -p ${TTRSS_PATH_THEMES}
+    # git clone --depth=1 https://github.com/levito/tt-rss-feedly-theme.git ${TTRSS_PATH_THEMES}/levito-feedly-git
+    # git clone --depth=1 https://github.com/Gravemind/tt-rss-feedlish-theme.git ${TTRSS_PATH_THEMES}/gravemind-feedly-git
 
     # Enable additional system plugins.
     if [ -z ${TTRSS_PLUGINS} ]; then
@@ -55,6 +55,6 @@ if [ "x$MODE" == "xupdater" ]; then
     echo "Setup: Applying updates ..."
     exec php /var/www/html/update.php --daemon
 else
-    # exec php -f /var/www/html/update_daemon2.php &
+    exec php -f /var/www/html/update_daemon2.php &
     exec apache2ctl -DFOREGROUND
 fi
