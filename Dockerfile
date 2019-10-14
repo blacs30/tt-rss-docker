@@ -43,6 +43,8 @@ RUN  mkdir -p ${TTRSS_PATH_PLUGINS} \
   && git clone --depth=1 https://github.com/sepich/tt-rss-mobilize.git ${TTRSS_PATH_PLUGINS}/mobilize \
   && git clone --depth=1 https://github.com/m42e/ttrss_plugin-feediron.git ${TTRSS_PATH_PLUGINS}/feediron \
   && git clone --depth=1 https://github.com/DigitalDJ/tinytinyrss-fever-plugin ${TTRSS_PATH_PLUGINS}/fever \
+  && git clone --depth=1 https://git.tt-rss.org/fox/ttrss-mailer-smtp.git ${TTRSS_PATH_PLUGINS}/mailer_smtp \
+  && git clone --depth=1 https://git.tt-rss.org/fox/ttrss-time-to-read.git ${TTRSS_PATH_PLUGINS}/time_to_read \
   && mkdir -p ${TTRSS_PATH_THEMES} \
   && git clone --depth=1 https://github.com/levito/tt-rss-feedly-theme.git ${TTRSS_PATH_THEMES}/levito-feedly-git \
   && git clone --depth=1 https://github.com/Gravemind/tt-rss-feedlish-theme.git ${TTRSS_PATH_THEMES}/gravemind-feedly-git
