@@ -40,7 +40,6 @@ RUN curl -L https://git.tt-rss.org/fox/tt-rss/archive/${TTRSS_VERSION}.tar.gz -o
   && tar xzf /ttrss.tar.gz -C ${TTRSS_PATH} --strip 1 && test -f /ttrss.tar.gz && rm -f /ttrss.tar.gz
 
 RUN  mkdir -p ${TTRSS_PATH_PLUGINS} \
-  && git clone --depth=1 https://github.com/sepich/tt-rss-mobilize.git ${TTRSS_PATH_PLUGINS}/mobilize \
   && git clone --depth=1 https://github.com/m42e/ttrss_plugin-feediron.git ${TTRSS_PATH_PLUGINS}/feediron \
   && git clone --depth=1 https://github.com/DigitalDJ/tinytinyrss-fever-plugin ${TTRSS_PATH_PLUGINS}/fever \
   && git clone --depth=1 https://git.tt-rss.org/fox/ttrss-mailer-smtp.git ${TTRSS_PATH_PLUGINS}/mailer_smtp \
