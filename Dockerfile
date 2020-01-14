@@ -45,7 +45,11 @@ RUN  mkdir -p ${TTRSS_PATH_PLUGINS} \
   && git clone --depth=1 https://git.tt-rss.org/fox/ttrss-time-to-read.git ${TTRSS_PATH_PLUGINS}/time_to_read \
   && mkdir -p ${TTRSS_PATH_THEMES} \
   && git clone --depth=1 https://github.com/levito/tt-rss-feedly-theme.git ${TTRSS_PATH_THEMES}/levito-feedly-git \
-  && git clone --depth=1 https://github.com/Gravemind/tt-rss-feedlish-theme.git ${TTRSS_PATH_THEMES}/gravemind-feedly-git
+  && git clone --depth=1 https://github.com/Gravemind/tt-rss-feedlish-theme.git ${TTRSS_PATH_THEMES}/gravemind-feedly-git \
+  && cp -r ${TTRSS_PATH_THEMES}/levito-feedly-git/feedly* ${TTRSS_PATH_THEMES}/ \
+  && cp -r ${TTRSS_PATH_THEMES}/gravemind-feedly-git/*css ${TTRSS_PATH_THEMES}/ \
+  && cp -r ${TTRSS_PATH_THEMES}/gravemind-feedly-git/*less ${TTRSS_PATH_THEMES}/ \
+  && curl -L https://raw.githubusercontent.com/jonathanherrmannengel/tt-rss_reeder_theme/master/ijreeder.css -o ${TTRSS_PATH_THEMES}/ijreeder.css
 
 # configure file permissions for ttrss
 RUN chown -R 1001:1001 /var/www/html && find /var/www/html -type f -exec chmod 644 {} \; \
