@@ -36,8 +36,7 @@ COPY ./config/apache/ports.conf /etc/apache2/ports.conf
 
 WORKDIR ${TTRSS_PATH}
 
-RUN curl -L https://git.tt-rss.org/fox/tt-rss/archive/${TTRSS_VERSION}.tar.gz -o /ttrss.tar.gz \
-  && tar xzf /ttrss.tar.gz -C ${TTRSS_PATH} --strip 1 && test -f /ttrss.tar.gz && rm -f /ttrss.tar.gz
+RUN git clone --depth=1 https://git.tt-rss.org/fox/tt-rss.git ${TTRSS_PATH}
 
 RUN  mkdir -p ${TTRSS_PATH_PLUGINS} \
   && git clone --depth=1 https://github.com/m42e/ttrss_plugin-feediron.git ${TTRSS_PATH_PLUGINS}/feediron \
@@ -49,9 +48,6 @@ RUN  mkdir -p ${TTRSS_PATH_PLUGINS} \
   && git clone --depth=1 https://github.com/Gravemind/tt-rss-feedlish-theme.git ${TTRSS_PATH_THEMES}/gravemind-feedly-git
 
 # configure file permissions for ttrss
-RUN ls -la /var/www/html
-
-
 RUN chown -R 1001:1001 /var/www/html && find /var/www/html -type f -exec chmod 644 {} \; \
     && find /var/www/html -type d -exec chmod 755 {} \; \
     && chmod 777 cache/* feed-icons lock
