@@ -1,6 +1,6 @@
 FROM debian:10
 
-ENV TTRSS_VERSION=1.15.3
+ENV TTRSS_COMMIT_SHA=586ed55178
 
 ENV TTRSS_PATH=/var/www/html
 ENV TTRSS_PATH_THEMES=${TTRSS_PATH}/themes.local
@@ -36,7 +36,8 @@ COPY ./config/apache/ports.conf /etc/apache2/ports.conf
 
 WORKDIR ${TTRSS_PATH}
 
-RUN git clone --depth=1 https://git.tt-rss.org/fox/tt-rss.git ${TTRSS_PATH}
+RUN git clone --depth=1 https://git.tt-rss.org/fox/tt-rss.git ${TTRSS_PATH} \
+  && cd ${TTRSS_PATH} && git checkout ${TTRSS_COMMIT_SHA}
 
 RUN  mkdir -p ${TTRSS_PATH_PLUGINS} \
   && git clone --depth=1 https://github.com/m42e/ttrss_plugin-feediron.git ${TTRSS_PATH_PLUGINS}/feediron \
