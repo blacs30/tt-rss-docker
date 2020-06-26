@@ -1,6 +1,6 @@
 FROM debian:10
 
-ENV TTRSS_COMMIT_SHA=586ed55178
+ENV TTRSS_COMMIT_SHA=c352e872e9
 
 ENV TTRSS_PATH=/var/www/html
 ENV TTRSS_PATH_THEMES=${TTRSS_PATH}/themes.local
@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         php7.3-xml \
         git \
         curl \
+        sendmmail \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/www/html/*
 
 # configure apache to work with docker
