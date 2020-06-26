@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         php7.3-xml \
         git \
         curl \
-        sendmmail \
+        sendmail \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/www/html/*
 
 # configure apache to work with docker
