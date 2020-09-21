@@ -1,24 +1,32 @@
-FROM debian:10
+FROM ubuntu:20.04
 
-ENV TTRSS_COMMIT_SHA=c352e872e9
+ENV TTRSS_COMMIT_SHA=486f1d84ed
 
 ENV TTRSS_PATH=/var/www/html
 ENV TTRSS_PATH_THEMES=${TTRSS_PATH}/themes.local
 ENV TTRSS_PATH_PLUGINS=${TTRSS_PATH}/plugins.local
 
+#RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true; \
+#    echo -e "tzdata tzdata/Areas select Europe\ntzdata tzdata/Zones/Europe select Amsterdam" > /tmp/tz ; \
+#    debconf-set-selections /tmp/tz; \
+#    dpkg-reconfigure -f non-interactive tzdata
+
+RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
+
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
         apache2 \
         ca-certificates \
-        libapache2-mod-php7.3 \
-        php7.3-cli \
-        php7.3-curl \
-        php7.3-gd \
-        php7.3-intl \
-        php7.3-json \
-        php7.3-mbstring \
-        php7.3-mysql \
-        php7.3-pgsql \
-        php7.3-xml \
+        libapache2-mod-php7.4 \
+        php7.4-cli \
+        php7.4-curl \
+        php7.4-gd \
+        php7.4-intl \
+        php7.4-json \
+        php7.4-mbstring \
+        php7.4-mysql \
+        php7.4-pgsql \
+        php7.4-xml \
         git \
         curl \
         sendmail \
@@ -30,7 +38,7 @@ RUN mkdir -p /var/log/apache2/ /var/run/apache2/ /var/lock/apache2/ \
     && ln -sf /dev/stdout /var/log/apache2/error.log \
     && chmod 777 /var/log/apache2/ /var/run/apache2/ /var/lock/apache2/ \
     && a2disconf other-vhosts-access-log.conf \
-    && a2enmod rewrite && a2enmod php7.3
+    && a2enmod rewrite && a2enmod php7.4
 
 COPY ./config/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 COPY ./config/apache/ports.conf /etc/apache2/ports.conf
