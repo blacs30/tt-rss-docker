@@ -70,6 +70,7 @@ COPY ./config/ttrss/config.php /var/www/html/config.php
 
 COPY ./config/srv /srv/
 RUN chmod +x /srv/*sh && chown -R 1001:1001 /srv
+RUN useradd -rm -d /home/ubuntu -s /bin/bash -u 1001 ubuntu
 
 VOLUME /data
 
